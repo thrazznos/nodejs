@@ -1,11 +1,21 @@
+// RESOURCES:
+// https://www.digitalocean.com/community/tutorials/test-a-node-restful-api-with-mocha-and-chai
+// https://www.chaijs.com/plugins/chai-http/
+// https://devhints.io/chai
+// https://stackoverflow.com/questions/43320699/chai-response-body-is-always-empty
+
+
+// TO RUN: npm test
+
 //During the test the env variable is set to test
 process.env.NODE_ENV = 'test';
 
 const { expect } = require('chai');
 let chai = require('chai');
 let chaiHttp = require('chai-http')
+
 //let server = require('../index') //Brings in the server code for chaiRequest to use
-const server = 'http://localhost:3000';
+const server = 'http://localhost:3000'; //Uses a local running server
 
 let should = chai.should(); 
 
