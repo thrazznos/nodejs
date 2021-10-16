@@ -1,4 +1,5 @@
 //const { response } = require('express');
+const { resolveSoa } = require('dns');
 const express = require('express')
 const app = express();
 const Joi = require('joi');
@@ -34,8 +35,8 @@ app.get('/', (req, resp) => {
     resp.send("Hello World Response!!!");
 })
 
-app.get('/api/staticcourses', (req, resp) => {
-    resp.send([1, 2, 3])
+app.get('/api/courses', (req, resp) => {
+    resp.send(courses)
 })
 
 //Route Parameters example
@@ -52,11 +53,7 @@ app.get('/api/courses/:id', (req, resp) => {
 })
 
 app.post('/api/courses', (req, resp) => {
-    const schema = Joi.object({
-        name: Joi.string().min(3).required()
-    });
-
-    const {error, value} = schema.validate(req.body)
+    const error = validateCourse(req.body)
     if(error) {
         resp.status(400).send(error.details[0].message)
         return;
@@ -70,11 +67,34 @@ app.post('/api/courses', (req, resp) => {
     resp.send(course);
 })
 
+app.put('/api/courses/:id', (req, resp) => {
+    const error = validateCourse(req.body)
+    if(error) {
+        resp.status(400).send(error.details[0].message)
+        return;
+    }
+    const course = courses.find(c => c.id === parseInt(req.params.id));
+    if(!course) resp.status(404).send("Course not found")
+
+    course.name = req.body.name;
+    resp.send(course);
+})
+
 //Query parameters example
 //localhost:5000/api/queries?somevalue=1&othervalue=2
 app.get('/api/queries', (req, resp) => {
     resp.send(req.query)
 })
+
+
+function validateCourse(course) {
+    const schema = Joi.object({
+        name: Joi.string().min(3).required()
+    })
+
+    const {error, value} = schema.validate(course)
+    return error;
+}
 
 const port = process.env.port || 3000 //Pulls from $ENV:PORT if it exists
 

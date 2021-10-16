@@ -97,4 +97,68 @@ describe('Courses API', () => {
             })
         })
     })
+    describe.only("PUT Request", () => {
+        it('requires course id', (done) => {
+            chai.request(server)
+            .put('/api/courses')
+            .send()
+            .end((err, res) => {
+                res.should.have.status(404)
+                done();
+            })
+        })
+        it('requires name', (done) => {
+            let course = {
+
+            }
+            chai.request(server)
+            .put('/api/courses/1')
+            .send(course)
+            .end((err, res) => {
+                res.should.have.status(400)
+                res.text.length.should.not.be.eql(0)
+                done();
+            })
+        })
+        it('requires course name > 3 characters', (done) =>{
+            let course = {
+                name: "Le"
+            }
+            chai.request(server)
+            .put('/api/courses/1')
+            .send(course)
+            .end((err, res) => {
+                res.should.have.status(400)
+                res.text.length.should.not.be.eql(0)
+                done();
+            })
+        })
+        it('returns the course name as part of response', (done) => {
+            let course = {
+                name: "Updated Course"
+            }
+            chai.request(server)
+            .put('/api/courses/1')
+            .send(course)
+            .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.have.property('name').eql('Updated Course')
+                res.body.should.have.property('id').eql(1)
+                done();
+            })
+        })
+        it('errors if accessing non existent course', (done) => {
+            let course = {
+                name: "Updated Course"
+            }
+            chai.request(server)
+            .put('/api/courses/999')
+            .send(course)
+            .end((err, res) => {
+                res.should.have.status(404)
+                res.text.should.be.eql('Course not found')
+                done();
+            })
+        })
+    })
 })
